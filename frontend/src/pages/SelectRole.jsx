@@ -11,7 +11,7 @@ const RoleSelection = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       <Logo />
-      {/* Right Panel - Role Selection Form */}
+      {/* Right */}
       <div className="flex-1 flex flex-col justify-space between items-start p-16 bg-white">
         <ArrowLeft className="mr-1" size={18} />
         <h2 className="text-2xl font-bold mb-6">Select Your Role</h2>
@@ -21,7 +21,7 @@ const RoleSelection = () => {
           SkillConnect.
         </p>
         <div className="w-md flex flex-col gap-10 ">
-          {/* Designer Option */}
+          {/* Artisan */}
           <div
             onClick={() => setSelectedRole("designer")}
             className={`flex flex-row gap-6 cursor-pointer border rounded-lg p-6 transition-all ${
@@ -30,13 +30,12 @@ const RoleSelection = () => {
                 : "border-gray-300 hover:border-blue-500"
             }`}
           >
-            {/* Icon */}
+           
             <Briefcase
               className="text-blue-600 bg-white border border-blue-500 rounded-lg p-4 mt-1"
               size={60}
             />
 
-            {/* Text Column */}
             <div className="flex flex-col">
               <h3 className="text-lg font-bold text-gray-800">
                 I'm an Artisan
@@ -47,7 +46,7 @@ const RoleSelection = () => {
             </div>
           </div>
 
-          {/* Client Option */}
+          {/* Client */}
           <div
             onClick={() => setSelectedRole("client")}
             className={`flex flex-row gap-6 cursor-pointer border rounded-lg p-6 transition-all ${
