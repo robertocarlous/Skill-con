@@ -1,30 +1,44 @@
-// index.js
 require("dotenv").config();
 const express = require("express");
-const admin = require("firebase-admin");
+const mongoose = require("mongoose");
+const admin = require('./utils/firebase');
 const bodyParser = require("body-parser");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
+const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Firebase Admin SDK Init
-const serviceAccount = require("./firebase-service.json");
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
 const db = admin.firestore();
 
-// Cloudinary Config
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
-// Endpoint: POST /profile
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => {
+    console.log(' MongoDB connected');
+
+    // Start server only after MongoDB connection
+    const PORT = process.env.PORT || 4000;
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+
+  })
+  .catch((err) => {
+    console.error(' MongoDB connection error:', err.message);
+  });
+
+// Optional: Mongoose query debugging
+// mongoose.set('debug', true);
+
+// Firebase Profile Creation Endpoint (still Firestore-based)
 app.post("/profile", async (req, res) => {
   try {
     const { userId, name, role, certUrl } = req.body;
@@ -47,8 +61,6 @@ app.post("/profile", async (req, res) => {
   }
 });
 
-// Start the server
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Routes
+app.use('/api/profile', userRoutes);
+app.use('/api/auth', authRoutes);
