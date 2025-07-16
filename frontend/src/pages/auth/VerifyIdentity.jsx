@@ -1,18 +1,27 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import Logo from "../components/Logo";
+import { ArrowLeft,User } from "lucide-react";
+import Header from "../../components/Header";
 
-const VerifyIdentity = () => {
+
+const VerifyIdentity = ( {next,prev }) => {
   const [nin, setNin] = useState("");
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
-      <Logo />
-      {/* Right Panel - NIN Input */}
-      <div className="flex-1 flex flex-col justify-center items-start p-16 bg-white">
+    <div className="min-h-screen  flex flex-col justify-center items-center bg-gray-50">
+       <Header />
+     
+      <div className="flex-1 flex flex-col justify-center items-center p-16 bg-white">
         <div className="w-full max-w-md">
+          <div className="mb-8">
+          <button
+          onClick={prev}
+          className="flex items-center text-blue-600 hover:text-blue-800 mb-6"
+        >
+          <ArrowLeft className="mr-1" size={30} />
+        
+        </button>
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Verify Your Identity
+         Verify Your Identity
           </h2>
           <p className="text-gray-600 mb-6">
             To ensure a safe and trusted community for all users, we require a
@@ -40,28 +49,33 @@ const VerifyIdentity = () => {
                 required
               />
             </div>
+<button
+  type="button"
+  disabled={nin.length !== 11}
+  onClick={(e) => {
+    e.preventDefault();
+    if (nin.length === 11) {
 
-            {/* Continue Link */}
-            <Link
-              to="/selectrole"
-              className={`block w-full text-center ${
-                nin.length === 11
-                  ? "bg-[#275DB0] hover:bg-blue-700"
-                  : "bg-gray-300 cursor-not-allowed"
-              } text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200`}
-              onClick={(e) => {
-                if (nin.length !== 11) {
-                  e.preventDefault();
-                  alert("Please enter a valid 11-digit NIN.");
-                }
-              }}
-            >
-              Continue
-            </Link>
+      next();
+
+    } else {
+      alert("Please enter a valid 11-digit NIN.");
+    }
+  }}
+  className={`block w-full text-center ${
+    nin.length === 11
+      ? "bg-[#275DB0] hover:bg-blue-700"
+      : "bg-gray-300 cursor-not-allowed"
+  } text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200`}
+>
+  Continue
+    </button>
+            
           </form>
         </div>
+        </div>
       </div>
-    </div>
+</div>
   );
 };
 
