@@ -7,6 +7,8 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
+const paymentRoutes = require('./routes/paymentroutes')
+
 
 const app = express();
 app.use(bodyParser.json());
@@ -64,3 +66,5 @@ app.post("/profile", async (req, res) => {
 // Routes
 app.use('/api/profile', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api', paymentRoutes);
+

@@ -11,8 +11,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 async function getToken() {
-    const email = 'robbert@gmail.com';       
-    const password = 'robbert';             
+    const email = 'robbert@gmail.com';
+    const password = 'robbert';
 
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -24,3 +24,28 @@ async function getToken() {
 }
 
 getToken();
+
+
+
+
+// initialize dummy data for testing
+// {
+//    "jobId": "test-job-123",
+//   "clientId": "sample-client-id",
+//   "artisanId": "sample-artisan-id",
+//   "totalAmount": 1000,
+//   "email":"robert@gmail.com"
+// }
+
+//recipient data testing 
+// {
+//   "artisanId": "artisan123",
+//   "accountName": "John Doe",
+//   "accountNumber": "1424059566",
+//   "bankCode": "044"
+// }
+
+//data to test release
+//http://localhost:4000/api/payments/release/test-job-123
+
+

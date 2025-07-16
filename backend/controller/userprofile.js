@@ -56,8 +56,8 @@ exports.uploadImage = async (req, res) => {
     });
 
     const updated = await User.findOneAndUpdate(
-      { firebaseUid: req.user.uid },                  // Use firebaseUid
-      { profileImage: result.secure_url },            // Use profileImage
+      { firebaseUid: req.user.uid },
+      { profileImage: result.secure_url },
       { new: true }
     );
 
@@ -68,8 +68,8 @@ exports.uploadImage = async (req, res) => {
     res.json({ message: "Image uploaded", image: updated.profileImage });
   } catch (error) {
     console.error(error);
-    console.log('req.file:', req.file);     // Should print the uploaded file object
-    console.log('req.body:', req.body);     // Should print any additional form data
+    console.log('req.file:', req.file);
+    console.log('req.body:', req.body);
     res.status(500).json({ error: "Image upload failed" });
   }
 };
