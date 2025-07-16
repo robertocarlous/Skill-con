@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import Logo from "../components/Logo";
 
@@ -11,6 +11,8 @@ const SignUp = () => {
     password: "",
     confirmPassword: "",
   });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,16 +22,40 @@ const SignUp = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sign up attempt:", formData);
-    // Handle sign up logic here
+    setLoading(true);
+    const payload = {
+      fullName: formData.fullName,
+      email: formData.emailOrPhone, // assuming email for now
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      phoneNumber: "", // add if you collect it
+      role: "client", // or get from user selection
+    };
+    try {
+      const res = await fetch("http://localhost:4000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        navigate("/verify", { state: { email: formData.emailOrPhone } });
+      } else {
+        alert(data.error || "Signup failed");
+      }
+    } catch {
+      alert("Network error during signup");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       <Logo />
-{/* Right Panel - Sign Up Form */}
+      {/* Right Panel - Sign Up Form */}
       <div className="flex-1 flex flex-col justify-between items-start p-14 bg-white">
         <div className="w-full max-w-md">
           <div className="mb-8">
@@ -154,12 +180,13 @@ const SignUp = () => {
               </div>
             </div>
 
-            <Link
-              to="/verify"
-              className="bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md text-center block"
+            <button
+              type="submit"
+              className="bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md text-center block w-full"
+              disabled={loading}
             >
-              Continue
-            </Link>
+              {loading ? "Loading..." : "Continue"}
+            </button>
           </form>
         </div>
       </div>

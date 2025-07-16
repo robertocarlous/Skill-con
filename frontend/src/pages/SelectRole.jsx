@@ -1,12 +1,44 @@
-import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Briefcase, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
 
 const RoleSelection = () => {
   const [selectedRole, setSelectedRole] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email || "";
+
+  const handleContinue = async () => {
+    if (!selectedRole) return;
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:4000/api/auth/set-role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, role: selectedRole }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        // Navigate to role-specific dashboard
+        if (selectedRole === "client") {
+          navigate("/client-dashboard");
+        } else if (selectedRole === "artisan") {
+          navigate("/artisan-dashboard");
+        } else {
+          navigate("/welcome");
+        }
+      } else {
+        alert(data.error || "Failed to set role");
+      }
+    } catch {
+      alert("Network error while setting role");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
@@ -23,14 +55,13 @@ const RoleSelection = () => {
         <div className="w-md flex flex-col gap-10 ">
           {/* Artisan */}
           <div
-            onClick={() => setSelectedRole("designer")}
+            onClick={() => setSelectedRole("artisan")}
             className={`flex flex-row gap-6 cursor-pointer border rounded-lg p-6 transition-all ${
-              selectedRole === "designer"
+              selectedRole === "artisan"
                 ? "border-blue-600 bg-blue-50"
                 : "border-gray-300 hover:border-blue-500"
             }`}
           >
-           
             <Briefcase
               className="text-blue-600 bg-white border border-blue-500 rounded-lg p-4 mt-1"
               size={60}
@@ -70,14 +101,17 @@ const RoleSelection = () => {
 
         {selectedRole && (
           <div className="mt-6">
-            <Link
-              to="/"
+            <button
               className="bg-[#275DB0] text-white py-2 px-6 rounded hover:bg-blue-700 transition-colors duration-200"
-              onClick={() => alert(`You selected: ${selectedRole}`)}
+              onClick={handleContinue}
+              disabled={loading}
             >
-              Continue{" "}
-              {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
-            </Link>
+              {loading
+                ? "Saving..."
+                : `Continue ${
+                    selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
+                  }`}
+            </button>
           </div>
         )}
       </div>

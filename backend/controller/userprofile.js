@@ -4,12 +4,16 @@ const cloudinary = require("../utils/cloudinary");
 // GET /api/profile
 exports.getProfile = async (req, res) => {
   try {
-    const user = req.user;  // Firebase Decoded Token
+    // Find user in MongoDB by Firebase UID
+    const user = await User.findOne({ firebaseUid: req.user.uid });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
     res.json({
-      uid: user.uid,
+      uid: user.firebaseUid,
       email: user.email,
-      emailVerified: user.email_verified,
-      signInProvider: user.firebase.sign_in_provider
+      role: user.role,
+      emailVerified: user.isVerified,
     });
   } catch (error) {
     res.status(500).json({ error: "Error fetching profile" });
@@ -20,7 +24,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    console.log('Decoded Firebase UID:', req.user.uid);
+    console.log("Decoded Firebase UID:", req.user.uid);
 
     const { bio, address } = req.body;
 
@@ -35,13 +39,11 @@ exports.updateProfile = async (req, res) => {
     }
 
     res.json({ message: "Profile updated", user: updated });
-
   } catch (error) {
-    console.error('Update Error:', error.message);
+    console.error("Update Error:", error.message);
     res.status(500).json({ error: "Error updating profile" });
   }
 };
-
 
 exports.uploadImage = async (req, res) => {
   try {
@@ -56,8 +58,8 @@ exports.uploadImage = async (req, res) => {
     });
 
     const updated = await User.findOneAndUpdate(
-      { firebaseUid: req.user.uid },                  // Use firebaseUid
-      { profileImage: result.secure_url },            // Use profileImage
+      { firebaseUid: req.user.uid }, // Use firebaseUid
+      { profileImage: result.secure_url }, // Use profileImage
       { new: true }
     );
 
@@ -68,8 +70,8 @@ exports.uploadImage = async (req, res) => {
     res.json({ message: "Image uploaded", image: updated.profileImage });
   } catch (error) {
     console.error(error);
-    console.log('req.file:', req.file);     // Should print the uploaded file object
-    console.log('req.body:', req.body);     // Should print any additional form data
+    console.log("req.file:", req.file); // Should print the uploaded file object
+    console.log("req.body:", req.body); // Should print any additional form data
     res.status(500).json({ error: "Image upload failed" });
   }
 };

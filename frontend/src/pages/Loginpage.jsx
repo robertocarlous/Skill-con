@@ -1,9 +1,11 @@
 import React from "react";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import Logo from "../components/Logo";
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const SkillConnectLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -11,6 +13,8 @@ const SkillConnectLogin = () => {
     emailOrPhone: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,10 +24,39 @@ const SkillConnectLogin = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempt:", formData);
-    // Handle login logic here
+    setLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.emailOrPhone,
+        formData.password
+      );
+      const idToken = await userCredential.user.getIdToken();
+      // Fetch user profile to determine role
+      const res = await fetch("http://localhost:4000/api/profile", {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      const data = await res.json();
+      console.log("User profile data:", data);
+      if (res.ok) {
+        // Navigate based on role
+        if (data.role === "client") {
+          navigate("/client-dashboard");
+        } else if (data.role === "artisan") {
+          navigate("/artisan-dashboard");
+        } else {
+          navigate("/selectrole", { state: { email: data.email } });
+        }
+      } else {
+        alert(data.error || "Login failed");
+      }
+    } catch (error) {
+      alert(error.message || "Login error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,7 +75,7 @@ const SkillConnectLogin = () => {
           </div>
 
           {/* Login Form */}
-          <div className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Email or Phone Input */}
             <div>
               <label
@@ -101,10 +134,11 @@ const SkillConnectLogin = () => {
             <button
               type="submit"
               className="w-md bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              disabled={loading}
             >
-              Log In
+              {loading ? "Logging in..." : "Log In"}
             </button>
-          </div>
+          </form>
 
           <div className="mt-6 text-left">
             <p className="text-sm text-gray-600 font-bold">

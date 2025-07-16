@@ -1,21 +1,30 @@
-import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRef, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
 
 const VerifyPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [email, setEmail] = useState("");
+  const [emailLocked, setEmailLocked] = useState(false);
+  const [loading, setLoading] = useState(false);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state && location.state.email) {
+      setEmail(location.state.email);
+      setEmailLocked(true);
+    }
+  }, [location.state]);
 
   const handleChange = (index, value) => {
     if (!/^\d?$/.test(value)) return;
-
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
-
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -43,12 +52,34 @@ const VerifyPage = () => {
     inputRefs.current[nextIndex]?.focus();
   };
 
-  const handleSubmit = () => {
-    if (code.every((digit) => digit !== "")) {
-      // Redirect after successful entry
-      navigate("/verifyidentity");
-    } else {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      alert("Please enter your email.");
+      return;
+    }
+    if (code.some((digit) => digit === "")) {
       alert("Please enter the full 6-digit code");
+      return;
+    }
+    const otp = code.join("");
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:4000/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        navigate("/selectrole", { state: { email } });
+      } else {
+        alert(data.error || "OTP verification failed");
+      }
+    } catch {
+      alert("Network error during OTP verification");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,35 +94,56 @@ const VerifyPage = () => {
             Verify Your Account
           </h2>
           <p className="text-gray-600 mb-6">
-            We've sent a 6-digit code to skillconnect@gmail.com Please enter
-            code to confirm your account.
+            We've sent a 6-digit code to your email. Please enter the code to
+            confirm your account.
           </p>
-
-          <div className="flex space-x-2 mb-6" onPaste={handlePaste}>
-            {code.map((digit, index) => (
-              <input
-                key={index}
-                type="text"
-                maxLength="1"
-                value={digit}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                ref={(el) => (inputRefs.current[index] = el)}
-                className="w-12 h-12 text-center text-xl border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            ))}
-          </div>
-
-          <p className="text-sm text-gray-600 mb-6">
+          <form onSubmit={handleSubmit}>
+            {!emailLocked && (
+              <div className="mb-4">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 text-gray-900 placeholder-gray-400"
+                  required
+                />
+              </div>
+            )}
+            <div className="flex space-x-2 mb-6" onPaste={handlePaste}>
+              {code.map((digit, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  maxLength="1"
+                  value={digit}
+                  onChange={(e) => handleChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  ref={(el) => (inputRefs.current[index] = el)}
+                  className="w-12 h-12 text-center text-xl border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              ))}
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg text-center"
+              disabled={loading}
+            >
+              {loading ? "Verifying..." : "Verify"}
+            </button>
+          </form>
+          <p className="text-sm text-gray-600 mb-6 mt-4">
             Didn't receive the code?
             <Link className="font-bold"> Resend code</Link>
           </p>
-          <Link
-            to="/verifyidentity"
-            className="w-md bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg text-center block"
-          >
-            Continue
-          </Link>
         </div>
       </div>
     </div>
