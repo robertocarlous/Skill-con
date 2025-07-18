@@ -1,16 +1,19 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import Logo from "../components/Logo";
+import Logo from "../../components/Logo";
+import { signupUser } from "../../utils/api";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    emailOrPhone: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,16 +23,28 @@ const SignUp = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sign up attempt:", formData);
-    // Handle sign up logic here
+    setLoading(true);
+    try {
+      if (formData.password !== formData.confirmPassword) {
+        alert("Passwords do not match");
+        setLoading(false);
+        return;
+      }
+      await signupUser(formData);
+      navigate("/verify", { state: { email: formData.email } });
+    } catch (err) {
+      alert(err.message || "Signup failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       <Logo />
-{/* Right Panel - Sign Up Form */}
+      {/* Right Panel - Sign Up Form */}
       <div className="flex-1 flex flex-col justify-between items-start p-14 bg-white">
         <div className="w-full max-w-md">
           <div className="mb-8">
@@ -68,21 +83,21 @@ const SignUp = () => {
               />
             </div>
 
-            {/* Email or Phone */}
+            {/* Email */}
             <div>
               <label
-                htmlFor="emailOrPhone"
+                htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Email or Phone Number
+                Email
               </label>
               <input
-                type="emailOrPhone"
-                id="emailOrPhone"
-                name="emailOrPhone"
-                value={formData.emailOrPhone}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleInputChange}
-                placeholder="Enter your email or phone number"
+                placeholder="Enter your email"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 text-gray-900 placeholder-gray-400"
                 required
               />
@@ -154,12 +169,13 @@ const SignUp = () => {
               </div>
             </div>
 
-            <Link
-              to="/verify"
+            <button
+              type="submit"
               className="bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md text-center block"
+              disabled={loading}
             >
-              Continue
-            </Link>
+              {loading ? "Loading..." : "Continue"}
+            </button>
           </form>
         </div>
       </div>

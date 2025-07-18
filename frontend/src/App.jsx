@@ -1,23 +1,31 @@
-import { Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/Loginpage.jsx';
-import SignUp from './pages/SignUp.jsx';
-import ErrorBoundary from './pages/ErrorBoundary.jsx';
-import NotFound from './pages/NotFound.jsx';
-import VerifyPage from './pages/VerifyPage.jsx';
-import VerifyIdentity from './pages/VerifyIdentity.jsx';
-import SelectRole from './pages/SelectRole.jsx';
+import { Routes, Route } from "react-router-dom";
+import LogIn from "./pages/auth/LogIn";
+import SignUp from "./pages/auth/SignUp";
+import VerifyPage from "./pages/auth/VerifyPage";
+// import VerifyIdentity from "./pages/auth/VerifyIdentity";
+import SelectRole from "./pages/auth/SelectRole";
+import ErrorBoundary from "./pages/ErrorBoundary";
+import ArtisanProfile from "./pages/Artisan/ArtisanProfile";
+import ClientProfile from "./pages/Client/ClientProfile";
+import ClientDashboard from "./pages/Client/ClientDashboard";
+import ArtisanDashboard from "./pages/Artisan/ArtisanDashBoard";
 
-export default function App() {
+function App() {
   return (
     <ErrorBoundary>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
+        {/* <Route path="/verifyidentity" element={<VerifyIdentity />} /> */}
         <Route path="/verify" element={<VerifyPage />} />
-        <Route path="/verifyidentity" element={<VerifyIdentity />} />
         <Route path="/selectrole" element={<SelectRole />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="/artisanprofile" element={<ArtisanProfile />} />
+        <Route path="/clientprofile" element={<ClientProfile />} />
+        <Route path="/client-dashboard" element={<ClientDashboard />} />
+        <Route path="/artisan-dashboard" element={<ArtisanDashboard />} />
       </Routes>
     </ErrorBoundary>
   );
 }
+
+export default App;
