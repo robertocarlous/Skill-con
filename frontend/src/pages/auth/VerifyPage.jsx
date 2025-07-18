@@ -2,7 +2,10 @@ import { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import Logo from "../components/Logo";
+import Logo from "../../components/Logo";
+import { resendOtp, verifyOtp } from "../../utils/api";
+
+const RESEND_COOLDOWN = 30; // seconds
 
 const VerifyPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -12,13 +15,26 @@ const VerifyPage = () => {
   const inputRefs = useRef([]);
   const navigate = useNavigate();
   const location = useLocation();
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
     if (location.state && location.state.email) {
       setEmail(location.state.email);
       setEmailLocked(true);
     }
+    if (inputRefs.current[0]) {
+      inputRefs.current[0].focus();
+    }
   }, [location.state]);
+
+  useEffect(() => {
+    let timer;
+    if (resendCooldown > 0) {
+      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const handleChange = (index, value) => {
     if (!/^\d?$/.test(value)) return;
@@ -65,21 +81,33 @@ const VerifyPage = () => {
     const otp = code.join("");
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/api/auth/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const data = await verifyOtp(email, otp);
+      if (data.success) {
         navigate("/selectrole", { state: { email } });
       } else {
         alert(data.error || "OTP verification failed");
       }
-    } catch {
-      alert("Network error during OTP verification");
+    } catch (err) {
+      alert(err.message || "OTP verification failed");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!email) {
+      alert("Please enter your email.");
+      return;
+    }
+    setResendLoading(true);
+    try {
+      await resendOtp(email);
+      alert("A new OTP has been sent to your email.");
+      setResendCooldown(RESEND_COOLDOWN);
+    } catch (err) {
+      alert(err.message || "Failed to resend OTP");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -88,7 +116,12 @@ const VerifyPage = () => {
       <Logo />
       {/* Right Panel */}
       <div className="flex-1 flex flex-col justify-center items-start p-16 bg-white">
-        <ArrowLeft className="mr-1" size={18} />
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-blue-600 hover:text-blue-800 mb-6"
+        >
+          <ArrowLeft size={30} />
+        </button>
         <div className="w-full max-w-md">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Verify Your Account
@@ -134,15 +167,24 @@ const VerifyPage = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg text-center"
+              className="bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg text-center"
               disabled={loading}
             >
-              {loading ? "Verifying..." : "Verify"}
+              {loading ? "Verifying..." : "Continue"}
             </button>
           </form>
           <p className="text-sm text-gray-600 mb-6 mt-4">
             Didn't receive the code?
-            <Link className="font-bold"> Resend code</Link>
+            <button
+              type="button"
+              className="font-bold text-blue-600 disabled:text-gray-400 ml-1"
+              onClick={handleResendOtp}
+              disabled={resendLoading || resendCooldown > 0}
+            >
+              {resendCooldown > 0
+                ? `Resend in ${resendCooldown}s`
+                : "Resend code"}
+            </button>
           </p>
         </div>
       </div>

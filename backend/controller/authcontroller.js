@@ -1,60 +1,55 @@
 const admin = require("../utils/firebase");
 const User = require("../models/usermodel");
-// const { sendEmail } = require("../service/emailservice");
+const { sendEmail } = require("../service/emailservice");
 
 // Signup endpoint
 exports.signup = async (req, res) => {
-  const { fullName, email, password, confirmPassword, phoneNumber, role } =
-    req.body;
+  const { fullName, email, idToken } = req.body;
 
-  if (!fullName || !email || !password || !confirmPassword) {
+  if (!fullName || !email || !idToken) {
     return res.status(400).json({ error: "All fields are required." });
   }
 
-  if (password !== confirmPassword) {
-    return res.status(400).json({ error: "Passwords do not match." });
-  }
-
   try {
-    // Create user in Firebase Authentication
-    const userRecord = await admin.auth().createUser({
-      email,
-      password,
-      displayName: fullName,
-      phoneNumber: phoneNumber || undefined,
-    });
+    // Verify the Firebase ID token
+    const decoded = await admin.auth().verifyIdToken(idToken);
 
-    // Save the Firebase user to MongoDB
-    const newUser = new User({
-      firebaseUid: userRecord.uid,
-      fullName,
-      email: userRecord.email,
-      phoneNumber: phoneNumber || "",
-      role: role || "",
-      isVerified: false,
-    });
+    // Check if user already exists in MongoDB
+    let user = await User.findOne({ firebaseUid: decoded.uid });
+    if (!user) {
+      user = await User.create({
+        firebaseUid: decoded.uid,
+        fullName,
+        email,
+        isVerified: decoded.email_verified,
+      });
+    }
 
     // Generate OTP and expiry
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    newUser.otp = otp;
-    newUser.otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
-    await newUser.save();
+    user.otp = otp;
+    user.otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
 
-    console.log(`Generated OTP for ${newUser.email}: ${otp}`);
+    // Send OTP email
+    try {
+      await sendEmail(
+        user.email,
+        "Your SkillConnect OTP",
+        `Your OTP code is: ${otp}. It will expire in 10 minutes.`
+      );
+    } catch (emailErr) {
+      console.error("Error sending OTP email:", emailErr);
+    }
 
-    // // Send OTP email
-    // await sendEmail(
-    //   newUser.email,
-    //   "Your SkillConnect OTP",
-    //   `Your OTP code is: ${otp}. It will expire in 10 minutes.`
-    // );
+    console.log(`Generated OTP for ${user.email}: ${otp}`);
 
     return res.status(201).json({
       message: "User successfully created. OTP sent to email.",
-      firebaseUid: userRecord.uid,
-      mongoId: newUser._id,
-      email: newUser.email,
-      role: newUser.role,
+      firebaseUid: user.firebaseUid,
+      mongoId: user._id,
+      email: user.email,
+      role: user.role,
     });
   } catch (error) {
     console.error("Signup Error:", error.message);
@@ -84,7 +79,6 @@ exports.verifyOtp = async (req, res) => {
     user.otp = undefined;
     user.otpExpiry = undefined;
     await user.save();
-    // Optionally update Firebase emailVerified
     await admin.auth().updateUser(user.firebaseUid, { emailVerified: true });
     return res.json({ success: true, message: "OTP verified." });
   }
@@ -154,4 +148,42 @@ exports.setRole = async (req, res) => {
   user.role = role;
   await user.save();
   return res.json({ success: true, message: "Role updated.", role });
+};
+
+// Resend OTP endpoint
+exports.resendOtp = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: "Email is required." });
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
+    // Send OTP email
+    try {
+      await sendEmail(
+        user.email,
+        "Your SkillConnect OTP",
+        `Your OTP code is: ${otp}. It will expire in 10 minutes.`
+      );
+    } catch (emailErr) {
+      console.error("Error sending OTP email:", emailErr);
+    }
+    console.log(`Generated OTP for ${user.email}: ${otp}`);
+  } catch (error) {
+    console.error("Resend OTP Error:", error.message);
+    return res.status(500).json({ error: "Failed to resend OTP." });
+  }
+};
+
+// Logout endpoint
+exports.logout = async (req, res) => {
+  // For stateless JWT/Firebase, logout is handled on the client by clearing tokens
+  return res.json({ success: true, message: "Logged out successfully." });
 };

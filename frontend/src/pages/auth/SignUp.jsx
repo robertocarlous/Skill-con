@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import Logo from "../components/Logo";
+import Logo from "../../components/Logo";
+import { signupUser } from "../../utils/api";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    emailOrPhone: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
@@ -25,28 +26,16 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const payload = {
-      fullName: formData.fullName,
-      email: formData.emailOrPhone, // assuming email for now
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
-      phoneNumber: "", // add if you collect it
-      role: "client", // or get from user selection
-    };
     try {
-      const res = await fetch("http://localhost:4000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        navigate("/verify", { state: { email: formData.emailOrPhone } });
-      } else {
-        alert(data.error || "Signup failed");
+      if (formData.password !== formData.confirmPassword) {
+        alert("Passwords do not match");
+        setLoading(false);
+        return;
       }
-    } catch {
-      alert("Network error during signup");
+      await signupUser(formData);
+      navigate("/verify", { state: { email: formData.email } });
+    } catch (err) {
+      alert(err.message || "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -94,21 +83,21 @@ const SignUp = () => {
               />
             </div>
 
-            {/* Email or Phone */}
+            {/* Email */}
             <div>
               <label
-                htmlFor="emailOrPhone"
+                htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Email or Phone Number
+                Email
               </label>
               <input
-                type="emailOrPhone"
-                id="emailOrPhone"
-                name="emailOrPhone"
-                value={formData.emailOrPhone}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleInputChange}
-                placeholder="Enter your email or phone number"
+                placeholder="Enter your email"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 text-gray-900 placeholder-gray-400"
                 required
               />
@@ -182,7 +171,7 @@ const SignUp = () => {
 
             <button
               type="submit"
-              className="bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md text-center block w-full"
+              className="bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md text-center block"
               disabled={loading}
             >
               {loading ? "Loading..." : "Continue"}

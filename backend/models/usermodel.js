@@ -21,20 +21,35 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["artisan", "client"],
-    default: "client",
+    enum: ["artisan", "client", ""],
+    default: "",
+  },
+  // Profile fields for both
+  profileImage: {
+    type: String,
+    default: "",
   },
   bio: {
     type: String,
     default: "",
   },
-  profileImage: {
+  location: {
     type: String,
     default: "",
   },
-  address: {
+  // Artisan-specific fields
+  skill: {
     type: String,
     default: "",
+  },
+  yearsOfExperience: {
+    type: String,
+    default: "",
+  },
+  // Profile completion status
+  profileCompleted: {
+    type: Boolean,
+    default: false,
   },
   uploads: {
     type: [String],
