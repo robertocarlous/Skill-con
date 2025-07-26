@@ -94,18 +94,18 @@ const ArtisanProfile = ({ next, prev }) => {
   const isFormValid = bio.trim() && location && state && experience;
 
   return (
-    <div className="min-h-screen bg-gray-50 justify-center items-center">
+    <div className="max-h-full bg-[#FCFCFC] justify-center items-center">
       <Header />
 
-      <div className="max-w-2xl mx-auto  px-6 py-8 bg-white text-blue-600 hover:text-blue-800">
+      <div className="max-w-2xl mx-auto px-6 py-8 text-blue-600 hover:text-blue-800">
         <button
           onClick={prev}
-          className="flex items-center text-blue-600 hover:text-blue-800 mb-6"
+          className="flex items-center text-black hover:text-blue-800 mb-6"
         >
           <ArrowLeft className="mr-1" size={30} />
         </button>
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Complete Your Artisan Profile
           </h2>
           <p className="text-gray-600">
@@ -120,7 +120,7 @@ const ArtisanProfile = ({ next, prev }) => {
           </h3>
           <div className="flex items-center space-x-6">
             <div className="relative">
-              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 bg-[#FCFCFC] rounded-full flex items-center justify-center overflow-hidden">
                 {profilePhoto ? (
                   <img
                     src={profilePhoto}
@@ -195,7 +195,7 @@ const ArtisanProfile = ({ next, prev }) => {
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>
             {showLocationDropdown && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                 {locations.map((loc) => (
                   <button
                     key={loc}
@@ -250,7 +250,7 @@ const ArtisanProfile = ({ next, prev }) => {
           </label>
           <button
             onClick={() => setShowStateDropdown(!showStateDropdown)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 flex items-center justify-between bg-white"
+   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 flex items-center justify-between bg-white"
           >
             <span className={state ? "text-gray-900" : "text-gray-500"}>
               {state || "Select State"}
@@ -258,7 +258,7 @@ const ArtisanProfile = ({ next, prev }) => {
             <ChevronDown className="w-4 h-4 text-gray-400" />
           </button>
           {showStateDropdown && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-hidden">
               {states.map((st) => (
                 <button
                   key={st}
@@ -275,11 +275,11 @@ const ArtisanProfile = ({ next, prev }) => {
           )}
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-left">
           <button
             onClick={handleContinue}
             disabled={!isFormValid}
-            className={`px-8 py-3 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+            className={`w-52 px-8 py-3 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
               isFormValid
                 ? "bg-blue-600 hover:bg-blue-700 text-white"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"

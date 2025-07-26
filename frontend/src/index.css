@@ -1,3 +1,63 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scrollIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-in {
+  animation: scrollIn 1s ease-out forwards;
+  animation-delay: 1s;
+}
+
+
+.animate-fade-up {
+  animation: fade-up 1s ease-out forwards;
+}
+
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+.clip-wave {
+  clip-path: path("M0,0 C100,80 300,100 500,90 C700,100 900,80 1440,0 L1440,300 L0,300 Z");
+}
+@keyframes scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 25s linear infinite;
+}
+.animate-scroll {
+  animation: scroll 25s linear infinite;
+}
+
+.animate-slideIn {
+  animation: slideIn 1s ease-in-out both;
+}

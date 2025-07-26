@@ -89,13 +89,13 @@ const UploadCertifications = ({ prev }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 justify-center items-center">
+    <div className="min-h-screen flex flex-col bg-[#FCFCFC] justify-center items-center">
       <Header />
 
-      <div className="flex-1 flex flex-col justify-center items-left p-16 bg-white">
+      <div className="flex-1 flex flex-col justify-center items-left p-16 ">
         <button
           onClick={prev}
-          className="flex items-center text-blue-600 hover:text-blue-800 mb-6"
+          className="flex items-center text-black hover:text-blue-800 mb-6"
         >
           <ArrowLeft className="mr-1" size={30} />
         </button>
@@ -177,7 +177,7 @@ const UploadCertifications = ({ prev }) => {
       alert("Please upload all necessary data.");
     }
   }}
-  className="bg-blue-500 w-52 text-white px-6 py-3 rounded text-sm font-medium hover:bg-blue-600 transition-colors mt-5"
+  className="bg-[#275DB0] w-52 text-white px-6 py-3 rounded text-sm font-medium hover:bg-blue-600 transition-colors mt-5"
 >
   Save and Continue
 </button>

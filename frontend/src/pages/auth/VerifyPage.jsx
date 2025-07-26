@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft,User } from "lucide-react";
 import { Link } from "react-router-dom";
-import Header from "../../components/Header";
+import Logo from "../../components/Logo";
 
 
 const VerifyPage = ({ next,prev }) => {
@@ -55,16 +55,17 @@ const VerifyPage = ({ next,prev }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50">
-      <Header />
+    <div>
+    <div className="min-h-screen bg-[#FCFCFC] flex flex-col md:flex-row">
+      <Logo />
 
-      <div className="flex-1 flex flex-col justify-center items-start p-16 bg-white">
+      <div className="flex-1 flex flex-col justify-center items-start p-24">
         <div className="w-full max-w-md">
           <div className="mb-8">
             <h2 className="text-4xl font-bold text-gray-900 mb-2">
               <button
                 onClick={prev}
-                className="flex items-center text-blue-600 hover:text-blue-800 mb-6"
+                className="flex items-center text-black hover:text-blue-800 mb-6"
               >
                 <ArrowLeft className="mr-1" size={30} />
               </button>
@@ -90,19 +91,20 @@ const VerifyPage = ({ next,prev }) => {
               ))}
             </div>
 
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-gray-600 mb-6  font-semibold">
               Didn't receive the code?
               <Link className="font-bold"> Resend code</Link>
             </p>
             <button
               onClick={handleSubmit}
-              className="w-full bg-[#275DB0] text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              className="w-52 bg-[#275DB0] text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200"
             >
               Continue
             </button>
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

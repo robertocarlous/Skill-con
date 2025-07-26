@@ -8,6 +8,7 @@ import {
 import HeaderDashBoard from "../../components/HeaderDashBoard";
 import { Link } from "react-router-dom";
 
+
 // Data arrays//
 const statsData = [
   {
@@ -39,7 +40,7 @@ const quickActions = [
     subtitle: "Find skilled help for your project",
     icon: <Plus className="w-6 h-6 text-white" />,
     color: "bg-blue-500",
-    link: "/",
+    link: "/post-job",
   },
   {
     title: "Track Active Job",

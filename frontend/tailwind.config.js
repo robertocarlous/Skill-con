@@ -10,7 +10,12 @@ export default {
      fontFamily: {
         switzer: ['Switzer', 'sans-serif'],
       },
+       clipPath: {
+        'custom': 'polygon(0 0, 50% 10%, 100% 0, 100% 100%, 0 100%)',
+      },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-clip-path'),
+  ]
 }
 

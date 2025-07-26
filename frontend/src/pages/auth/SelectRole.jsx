@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ArrowLeft, Briefcase, User } from "lucide-react";
-import Header from "../../components/Header";
+import Logo from "../../components/Logo";
 
 const SelectRole= ({ next, prev }) => {
   const [selectedRole, setSelectedRole] = useState(null);
@@ -13,13 +13,13 @@ const SelectRole= ({ next, prev }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50">
-       <Header />
+    <div className="min-h-screen bg-[#FCFCFC] flex flex-col gap-6 md:flex-row">
+       <Logo />
 
       <div className="flex-1 flex flex-col justify-space between items-start p-16 bg-white">
         <button
           onClick={prev}
-          className="flex items-center text-blue-600 hover:text-blue-800 mb-6"
+          className="flex items-center text-black hover:text-blue-800 mb-6"
         >
           <ArrowLeft className="mr-1" size={30} />
           
@@ -36,7 +36,7 @@ const SelectRole= ({ next, prev }) => {
             onClick={() => setSelectedRole("artisan")}
             className={`flex flex-row gap-6 cursor-pointer border rounded-lg p-6 transition-all ${
               selectedRole === "artisan"
-                ? "border-blue-600 bg-blue-50"
+                ? "border-[#275DB0] bg-blue-50"
                 : "border-gray-300 hover:border-blue-500"
             }`}
           >

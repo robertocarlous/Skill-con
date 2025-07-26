@@ -72,13 +72,13 @@ const ClientProfile = ({ next, prev }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 flex flex-col justify-center items-center">
+    <div className="w-full min-h-screen bg-[#FCFCFC] flex flex-col justify-center items-center">
       <Header />
 
-      <div className="max-w-2xl mx-auto px-12 py-8 text-center justify-center items-center bg-white">
+      <div className="max-w-2xl mx-auto px-12 py-8 text-center justify-center items-center">
         <button
           onClick={prev}
-          className="flex items-center text-blue-600 hover:text-blue-800 mb-6">
+          className="flex items-center text-black hover:text-blue-800 mb-6">
           <ArrowLeft className="mr-1" size={30} />
         </button>
          <div className="text-center mb-8">
@@ -152,7 +152,7 @@ const ClientProfile = ({ next, prev }) => {
         />
       </div>
       <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-8">
                     Location
                   </label>
                   <button
@@ -162,10 +162,10 @@ const ClientProfile = ({ next, prev }) => {
                     <span className={location ? "text-gray-900" : "text-gray-500"}>
                       {location || "Select Location"}
                     </span>
-                    <ChevronDown className="w-60 h-4 text-gray-400" />
+                    <ChevronDown className="w-90 h-4  text-gray-400" />
                   </button>
                   {showLocationDropdown && (
-              <div className="absolute bottom-full right-0 mb-12 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute bottom-12 right-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
 
                       {locations.map((loc) => (
                         <button
@@ -184,11 +184,11 @@ const ClientProfile = ({ next, prev }) => {
                 </div>
       
 
-      <div className="text-left">
+      <div className="text-center">
         <button
           onClick={handleContinue}
            disabled={!isFormValid}
-          className="bg-blue-500 text-white px-8 py-3 m-10 rounded text-sm font-medium hover:bg-blue-600 transition-colors"
+          className="bg-[#275DB0] text-white px-12 py-3 m-10 rounded text-sm font-medium hover:bg-blue-600 transition-colors"
         >
           Continue
         </button>

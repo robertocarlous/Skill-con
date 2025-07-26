@@ -1,21 +1,22 @@
 import React, { useState } from "react";
 import { ArrowLeft,User } from "lucide-react";
-import Header from "../../components/Header";
+import Logo from "../../components/Logo";
 
 
 const VerifyIdentity = ( {next,prev }) => {
   const [nin, setNin] = useState("");
 
   return (
-    <div className="min-h-screen  flex flex-col justify-center items-center bg-gray-50">
-       <Header />
+    <div>
+   <div className="min-h-screen bg-[#FCFCFC] flex flex-col md:flex-row">
+       <Logo />
      
-      <div className="flex-1 flex flex-col justify-center items-center p-16 bg-white">
+      <div className="flex-1 flex flex-col justify-center items-left p-24 bg-white">
         <div className="w-full max-w-md">
           <div className="mb-8">
           <button
           onClick={prev}
-          className="flex items-center text-blue-600 hover:text-blue-800 mb-6"
+          className="flex items-center text-black hover:text-blue-800 mb-6"
         >
           <ArrowLeft className="mr-1" size={30} />
         
@@ -62,7 +63,7 @@ const VerifyIdentity = ( {next,prev }) => {
       alert("Please enter a valid 11-digit NIN.");
     }
   }}
-  className={`block w-full text-center ${
+  className={`block w-52 text-center ${
     nin.length === 11
       ? "bg-[#275DB0] hover:bg-blue-700"
       : "bg-gray-300 cursor-not-allowed"
@@ -75,6 +76,7 @@ const VerifyIdentity = ( {next,prev }) => {
         </div>
         </div>
       </div>
+</div>
 </div>
   );
 };

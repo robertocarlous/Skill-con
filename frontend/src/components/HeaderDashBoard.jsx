@@ -9,7 +9,8 @@ const HeaderDashBoard = ({ onPostJob }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <h1 className="text-xl font-semibold text-blue-600">SkillConnect</h1>
+            <h1 className="text-blue-500 text-2xl font-semibold">SkillConnect</h1>
+      
           </div>
           <div className="flex items-center space-x-4">
             <button 
