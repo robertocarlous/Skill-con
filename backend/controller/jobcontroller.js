@@ -4,35 +4,43 @@ const User = require("../models/usermodel");
 
 exports.createJob = async (req, res) => {
   try {
-    const { title, description, location, category, budget, deadline } =
-      req.body;
+    const {
+      jobTitle,
+      keySkills,
+      location,
+      proposedBudget,
+      timeline,
+      jobDescription,
+    } = req.body;
+
     if (
-      !title ||
-      !description ||
+      !jobTitle ||
+      !keySkills ||
       !location ||
-      !category ||
-      !budget ||
-      !deadline
+      !proposedBudget ||
+      !timeline ||
+      !jobDescription
     ) {
       return res.status(400).json({ error: "All fields are required." });
     }
-    // Find the user by Firebase UID
+
     const user = await User.findOne({ firebaseUid: req.user.uid });
     if (!user) {
       return res
         .status(401)
         .json({ error: "User not found or not authorized." });
     }
-    console.log("Creating job for user:", user._id, user.email);
+
     const job = await Job.create({
-      title,
-      description,
+      jobTitle,
+      keySkills,
       location,
-      category,
-      budget,
-      deadline,
+      proposedBudget,
+      timeline,
+      jobDescription,
       postedBy: user._id,
     });
+
     // try {
     //   await sendEmail(
     //     user.email,
@@ -43,21 +51,23 @@ exports.createJob = async (req, res) => {
     // } catch (error) {
     //   console.error("Error sending job posting email:", error);
     // }
+
     res
       .status(201)
       .json({ status: "Success", message: "Job created", data: { job } });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
 exports.listJobs = async (req, res) => {
   try {
-    const { location, category } = req.query;
+    const { location, keySkills } = req.query;
     let filter = {};
     if (location) filter.location = location;
-    if (category) filter.category = category;
+    if (keySkills) filter.keySkills = { $regex: keySkills, $options: "i" };
+
     const jobs = await Job.find(filter).sort({ createdAt: -1 });
     res.status(200).json({ status: "Success", data: { jobs } });
   } catch (error) {

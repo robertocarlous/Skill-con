@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   ArrowLeft,
   Upload,
@@ -13,9 +13,11 @@ import Modal from "../../components/ModalArtisan";
 import { updateArtisanProfile } from "../../utils/api";
 import { getAuth } from "firebase/auth";
 import { useUserStore } from "../../store/userStore";
+import { getProfile } from "../../utils/api";
 
 const ArtisanProfile = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [bio, setBio] = useState("");
   const [location, setLocation] = useState("");
@@ -128,7 +130,9 @@ const ArtisanProfile = () => {
     }
     setStep(2);
   };
+
   const handleFinalSubmit = async () => {
+    setLoading(true);
     if (certificationFiles.length === 0) {
       alert("Please upload at least one certification file.");
       return;
@@ -138,7 +142,7 @@ const ArtisanProfile = () => {
       const user = auth.currentUser;
       if (!user) throw new Error("Not authenticated");
       const idToken = await user.getIdToken();
-      const updatedUser = await updateArtisanProfile({
+      await updateArtisanProfile({
         profileImage: profilePhotoFile,
         bio,
         location,
@@ -147,7 +151,10 @@ const ArtisanProfile = () => {
         certifications: certificationFiles,
         idToken,
       });
-      setUser(updatedUser.user);
+      await user.reload();
+      const freshIdToken = await user.getIdToken(true);
+      const updateUser = await getProfile(freshIdToken);
+      setUser({ ...updateUser, firebaseUid: updateUser.uid });
       setShowModal(true);
     } catch (err) {
       alert(err.message || "Profile update failed");
@@ -414,7 +421,7 @@ const ArtisanProfile = () => {
               onClick={handleFinalSubmit}
               className="bg-blue-500 w-52 text-white px-6 py-3 rounded text-sm font-medium hover:bg-blue-600 transition-colors mt-5"
             >
-              Save and Continue
+              {loading ? "Saving..." : "Save and Continue"}
             </button>
           </>
         )}

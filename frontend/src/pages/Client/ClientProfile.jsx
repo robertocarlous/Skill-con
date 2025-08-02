@@ -6,8 +6,10 @@ import { updateClientProfile } from "../../utils/api";
 import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../../store/userStore";
+import { getProfile } from "../../utils/api";
 
 const ClientProfile = () => {
+  const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [bio, setBio] = useState("");
@@ -62,6 +64,7 @@ const ClientProfile = () => {
   };
 
   const handleContinue = async () => {
+    setLoading(true);
     if (!profilePhotoFile) {
       alert("Please upload a profile photo.");
       return;
@@ -86,13 +89,16 @@ const ClientProfile = () => {
       if (!formattedLocation.toLowerCase().endsWith(", nigeria")) {
         formattedLocation += ", Nigeria";
       }
-      const updated = await updateClientProfile({
+      await updateClientProfile({
         profileImage: profilePhotoFile,
         bio,
         location: formattedLocation,
         idToken,
       });
-      setUser(updated.user || updated);
+      await user.reload();
+      const freshIdToken = await user.getIdToken(true);
+      const updateUser = await getProfile(freshIdToken);
+      setUser({ ...updateUser, firebaseUid: updateUser.uid });
       setShowModal(true);
     } catch (err) {
       alert(err.message || "Profile update failed");
@@ -220,13 +226,14 @@ const ClientProfile = () => {
             disabled={!isFormValid}
             className="bg-blue-500 text-white px-8 py-3 m-10 rounded text-sm font-medium hover:bg-blue-600 transition-colors"
           >
-            Continue
+            {loading ? "Saving..." : "Save and Continue"}
           </button>
         </div>
         <Modal
           isOpen={showModal}
           onClose={() => {
             setShowModal(false);
+            navigate("/client-dashboard");
           }}
           onConfirm={() => {
             setShowModal(false);

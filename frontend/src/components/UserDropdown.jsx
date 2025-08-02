@@ -21,7 +21,7 @@ const UserDropdown = ({ profileCompleted, open, setOpen }) => {
     setOpen(false);
     if (option === "Log Out") {
       await logoutUser();
-      navigate("/");
+      navigate("/login");
     } else {
       alert(`${option} clicked`);
     }

@@ -1,11 +1,10 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
 import Logo from "../../components/Logo";
 import { resendOtp, verifyOtp } from "../../utils/api";
 
-const RESEND_COOLDOWN = 30; // seconds
+const RESEND_COUNTDOWN = 30;
 
 const VerifyPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -16,7 +15,7 @@ const VerifyPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [resendLoading, setResendLoading] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendCountdown, setResendCountdown] = useState(0);
 
   useEffect(() => {
     if (location.state && location.state.email) {
@@ -30,11 +29,11 @@ const VerifyPage = () => {
 
   useEffect(() => {
     let timer;
-    if (resendCooldown > 0) {
-      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    if (resendCountdown > 0) {
+      timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
     }
     return () => clearTimeout(timer);
-  }, [resendCooldown]);
+  }, [resendCountdown]);
 
   const handleChange = (index, value) => {
     if (!/^\d?$/.test(value)) return;
@@ -100,10 +99,10 @@ const VerifyPage = () => {
       return;
     }
     setResendLoading(true);
+    setResendCountdown(RESEND_COUNTDOWN);
     try {
       await resendOtp(email);
       alert("A new OTP has been sent to your email.");
-      setResendCooldown(RESEND_COOLDOWN);
     } catch (err) {
       alert(err.message || "Failed to resend OTP");
     } finally {
@@ -127,8 +126,9 @@ const VerifyPage = () => {
             Verify Your Account
           </h2>
           <p className="text-gray-600 mb-6">
-            We've sent a 6-digit code to your email. Please enter the code to
-            confirm your account.
+            We've sent a 6-digit code to your email{" "}
+            <span className="font-semibold text-blue-700">{email}</span>. Please
+            enter the code to confirm your account.
           </p>
           <form onSubmit={handleSubmit}>
             {!emailLocked && (
@@ -179,10 +179,10 @@ const VerifyPage = () => {
               type="button"
               className="font-bold text-blue-600 disabled:text-gray-400 ml-1"
               onClick={handleResendOtp}
-              disabled={resendLoading || resendCooldown > 0}
+              disabled={resendLoading || resendCountdown > 0}
             >
-              {resendCooldown > 0
-                ? `Resend in ${resendCooldown}s`
+              {resendCountdown > 0
+                ? `Resend in ${resendCountdown}s`
                 : "Resend code"}
             </button>
           </p>

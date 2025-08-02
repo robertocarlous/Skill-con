@@ -6,20 +6,40 @@ const cloudinary = require("../utils/cloudinary");
 // GET /api/profile
 exports.getProfile = async (req, res) => {
   try {
-    // Find user in MongoDB by Firebase UID
-    const user = await User.findOne({ firebaseUid: req.user.uid });
+    let user = await User.findOne({ firebaseUid: req.user.uid });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      user = await User.create({
+        firebaseUid: req.user.uid,
+        email: req.user.email,
+        fullName: req.user.name || req.user.email,
+        isVerified: req.user.email_verified,
+      });
+      console.log("[Profile] Auto-created user:", user);
     }
+
+    if (user.isVerified !== req.user.email_verified) {
+      user.isVerified = req.user.email_verified;
+      await user.save();
+      console.log("Updated isVerified in DB to:", user.isVerified);
+    }
+
     console.log("User profile fetched after login:", user);
     res.json({
       uid: user.firebaseUid,
       email: user.email,
+      fullName: user.fullName,
       role: user.role,
+      profileImage: user.profileImage,
+      bio: user.bio,
+      location: user.location,
+      skill: user.skill,
+      yearsOfExperience: user.yearsOfExperience,
+      uploads: user.uploads,
       emailVerified: user.isVerified,
       profileCompleted: user.profileCompleted,
     });
   } catch (error) {
+    console.error("[Profile] Error:", error);
     res.status(500).json({ error: "Error fetching profile" });
   }
 };
@@ -109,8 +129,8 @@ exports.uploadImage = async (req, res) => {
     });
 
     const updated = await User.findOneAndUpdate(
-      { firebaseUid: req.user.uid }, // Use firebaseUid
-      { profileImage: result.secure_url }, // Use profileImage
+      { firebaseUid: req.user.uid },
+      { profileImage: result.secure_url },
       { new: true }
     );
 

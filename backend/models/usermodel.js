@@ -21,10 +21,10 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["artisan", "client", ""],
-    default: "",
+    enum: ["artisan", "client", null],
+    default: null,
   },
-  // Profile fields for both
+  // Profile fields for both artisans and clients
   profileImage: {
     type: String,
     default: "",
@@ -58,12 +58,6 @@ const userSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false,
-  },
-  otp: {
-    type: String,
-  },
-  otpExpiry: {
-    type: Date,
   },
   createdAt: {
     type: Date,

@@ -1,4 +1,3 @@
-import React from "react";
 import { CheckCircleIcon } from "lucide-react";
 
 const Modal = ({ isOpen, onConfirm }) => {
@@ -6,12 +5,9 @@ const Modal = ({ isOpen, onConfirm }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg shadow-lg px-8 max-w-lg w-full min-h-96 flex flex-col justify-center items-center">
-        <h2 className="text-2xl font-bold mb-4 text-blue-700">
-          <CheckCircleIcon
-            className="block text-center text-blue-700 ml-32 mb-6"
-            size={40}
-          />
+      <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full flex flex-col justify-center items-center text-center">
+        <CheckCircleIcon className="text-blue-700 mb-4" size={40} />
+        <h2 className="text-2xl font-bold mb-2 text-blue-700">
           Your Profile is Complete!
         </h2>
         <p className="text-gray-600 text-center mb-6">

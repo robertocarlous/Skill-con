@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import Logo from "../../components/Logo";
 import { signupUser } from "../../utils/api";
+import { useToast } from "../../hooks/useToast";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +15,7 @@ const SignUp = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -28,14 +30,15 @@ const SignUp = () => {
     setLoading(true);
     try {
       if (formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match");
+        showToast("Passwords do not match", "error");
         setLoading(false);
         return;
       }
       await signupUser(formData);
-      navigate("/verify", { state: { email: formData.email } });
+      showToast("Signup successful! Please verify your email.", "success");
+      navigate("/verify-pending", { state: { email: formData.email } });
     } catch (err) {
-      alert(err.message || "Signup failed");
+      showToast(err.message || "Signup failed", "error");
     } finally {
       setLoading(false);
     }
@@ -54,7 +57,7 @@ const SignUp = () => {
             <p className="text-gray-600">
               Already have an account?{" "}
               <Link
-                to="/"
+                to="/login"
                 className="text-[#275DB0] hover:text-blue-700 font-medium transition-colors duration-200"
               >
                 Log In
@@ -78,11 +81,10 @@ const SignUp = () => {
                 value={formData.fullName}
                 onChange={handleInputChange}
                 placeholder="Enter your full name"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 text-gray-900 placeholder-gray-400"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 required
               />
             </div>
-
             {/* Email */}
             <div>
               <label
@@ -98,83 +100,78 @@ const SignUp = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 text-gray-900 placeholder-gray-400"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 required
               />
             </div>
-
             {/* Password */}
-            <div>
+            <div className="relative">
               <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Password
               </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="Enter password"
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 text-gray-900 placeholder-gray-400"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 bottom-3 transform -translate-y-1/4 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
-
             {/* Confirm Password */}
-            <div>
+            <div className="relative">
               <label
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Confirm Password
               </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  placeholder="Re-enter your password"
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 text-gray-900 placeholder-gray-400"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                placeholder="Confirm your password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 bottom-3 transform -translate-y-1/4 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
-
             <button
               type="submit"
-              className="bg-[#275DB0] hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md text-center block"
               disabled={loading}
+              className="w-[30%] bg-[#275DB0] hover:bg-blue-700 text-white py-3 px-4 rounded-lg text-center shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 font-semibold"
             >
-              {loading ? "Loading..." : "Continue"}
+              {loading ? "Signing up..." : "Sign Up"}
             </button>
           </form>
         </div>

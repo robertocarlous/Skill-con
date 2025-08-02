@@ -1,13 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const admin = require("./utils/firebase");
 const bodyParser = require("body-parser");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const jobRoutes = require("./routes/jobRoutes");
-const http = require("http");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -22,8 +22,7 @@ app.use(
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-const db = admin.firestore();
+app.use(cookieParser());
 
 // MongoDB Connection
 mongoose

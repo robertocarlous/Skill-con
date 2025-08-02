@@ -1,36 +1,39 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Bell, MessageSquare } from "lucide-react";
 import UserDropdown from "./UserDropdown";
 import { useUserStore } from "../store/userStore";
+import { useNavigate } from "react-router-dom";
 
 const DEFAULT_AVATAR = "https://www.gravatar.com/avatar/?d=mp&f=y";
 
-const Header = ({ showPostJobButton, onPostJob }) => {
+const Header = ({ showPostJobButton }) => {
   const user = useUserStore((state) => state.user);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+
   return (
     <header className="w-full sticky top-0 z-20 bg-white flex items-center justify-between px-6 py-4 shadow">
       <div className="flex items-center">
         <h3 className="text-blue-500 text-3xl font-bold">SkillConnect</h3>
       </div>
       <div className="flex items-center gap-5">
-        {showPostJobButton && (
+        {showPostJobButton && user?.role === "client" && (
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
-            onClick={onPostJob}
+            onClick={() => navigate("/post-job")}
           >
             Post a new Job
           </button>
         )}
         {user?.profileCompleted && (
-          <>
-            <button className="p-2 text-gray-600 hover:text-gray-800">
+          <div className="flex items-center gap-2">
+            <button className="rounded-full hover:bg-blue-50 p-2 text-gray-600 hover:text-gray-800">
               <Bell className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-600 hover:text-gray-800">
+            <button className="rounded-full hover:bg-blue-50 p-2 text-gray-600 hover:text-gray-800">
               <MessageSquare className="w-5 h-5" />
             </button>
-          </>
+          </div>
         )}
         <div
           className="flex items-center gap-2 cursor-pointer"
