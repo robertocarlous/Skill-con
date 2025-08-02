@@ -1,16 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: 'class',
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {},
-     fontFamily: {
-        switzer: ['Switzer', 'sans-serif'],
-      },
+    fontFamily: {
+      switzer: ["Switzer", "sans-serif"],
+    },
   },
-  plugins: [],
-}
-
+  plugins: [require("tailwind-scrollbar-hide")],
+};
