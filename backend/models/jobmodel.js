@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
 const jobSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
+  jobTitle: { type: String, required: true },
+  keySkills: { type: String, required: true },
   location: { type: String, required: true },
-  category: { type: String, required: true },
-  budget: { type: Number, required: true },
-  deadline: { type: Date, required: true },
+  proposedBudget: { type: Number, required: true },
+  timeline: { type: String, required: true },
+  jobDescription: { type: String, required: true },
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
